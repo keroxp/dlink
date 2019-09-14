@@ -1,6 +1,6 @@
 {
   "https://deno.land/std": {
     "version": "@v0.17.0",
-    "modules": ["/fs/path.ts"]
+    "modules": ["/fs/mod.ts", "/fs/path.ts", "/flags/mod.ts", "/fmt/colors.ts"]
   }
 }
