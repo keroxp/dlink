@@ -1,4 +1,4 @@
-#!/usr/bin/env deno --allow-write
+#!/usr/bin/env deno --allow-write --allow-read
 import * as path from "./vendor/https/deno.land/std/fs/path.ts";
 import { Modules } from "./mod.ts";
 
@@ -14,7 +14,7 @@ async function ensure(modules: Modules) {
       const modDir = path.dirname(modFile);
       await Deno.mkdir(modDir, true);
       const specifier = `${k}${v.version}${mod}`;
-      const link = `export * from "${specifier}";`;
+      const link = `export * from "${specifier}";\n`;
       const f = await Deno.open(modFile, "w");
       await Deno.write(f.rid, encoder.encode(link)).finally(() => f.close());
       console.log(`Linked: ${specifier}`);
@@ -22,6 +22,11 @@ async function ensure(modules: Modules) {
     await Promise.all(v.modules.map(writeLinkFile));
   }
 }
-import(`${Deno.cwd()}/modules.ts`).then(async modules => {
-  await ensure(modules.default);
-});
+async function main() {
+  const file = await Deno.readFile("./modules.json");
+  const decoder = new TextDecoder();
+  const json = JSON.parse(decoder.decode(file)) as Modules;
+  await ensure(json);
+}
+
+main();
