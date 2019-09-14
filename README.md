@@ -53,5 +53,12 @@ dink will automatically create module asias files that are described in `modules
 ### 3. Import module aliases
 
 ```ts
-import * fs from "./vendor/https/deno.land/std/fs/mod.ts
+import * fs from "./vendor/https/deno.land/std/fs/mod.ts"
 ```
+## Prior works
+
+- [dem](https://github.com/syumai/dem)
+
+## LICENSE
+
+MIT
