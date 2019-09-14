@@ -2,7 +2,7 @@
 import * as path from "./vendor/https/deno.land/std/fs/path.ts";
 import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
-import { green } from "./vendor/https/deno.land/std/fmt/colors.ts";
+import { green, gray } from "./vendor/https/deno.land/std/fmt/colors.ts";
 import { Modules } from "./mod.ts";
 
 function isDinkModules(x, errors: string[]): x is Modules {
@@ -42,22 +42,35 @@ async function ensure(modules: Modules) {
     const writeLinkFile = async (mod: string) => {
       const modFile = path.join(dir, mod);
       const modDir = path.dirname(modFile);
+      const specifier = `${k}${v.version}${mod}`;
+      if (await fs.exists(modFile)) {
+        console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
+        return;
+      }
+      const resp = await fetch(specifier, { method: "HEAD" });
+      if (resp.status !== 200) {
+        throw new Error(`failed to fetch metadata for ${specifier}`);
+      }
+      const link = `export * from "${resp.url}";\n`;
       await Deno.mkdir(modDir, true);
-      const specifier = `${k}${path.join(v.version, mod)}`;
-      const link = `export * from "${specifier}";\n`;
       const f = await Deno.open(modFile, "w");
-      await Deno.write(f.rid, encoder.encode(link)).finally(() => f.close());
+      try {
+        await Deno.write(f.rid, encoder.encode(link));
+      } finally {
+        f.close();
+      }
       console.log(`${green("Linked")}: ${specifier} -> ./${modFile}`);
     };
     await Promise.all(v.modules.map(writeLinkFile));
   }
 }
 
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 
 type DinkOptions = {
   file?: string;
 };
+
 async function main() {
   const args = flags.parse(Deno.args, {
     alias: {
@@ -113,6 +126,7 @@ async function main() {
     Deno.exit(1);
   }
   await ensure(json);
+  Deno.exit(0);
 }
 
 main();
