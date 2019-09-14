@@ -1,0 +1,2 @@
+# dink
+Deno module linker
