@@ -11,7 +11,7 @@ Managing URL module specifier in Deno is qutie hard. dink is designed to resolve
 # Install
 
 ```bash
-$ deno intall dink https://denopkg.com/keroxp/dink/main.ts
+$ deno intall dink https://denopkg.com/keroxp/dink/main.ts --allow-write --allow-read
 ```
 
 # Usage
