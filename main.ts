@@ -34,6 +34,7 @@ function isDinkModules(x, errors: string[]): x is Modules {
 
 async function ensure(modules: Modules) {
   const encoder = new TextEncoder();
+  const lockFile = await readLockFile();
   for (const [k, v] of Object.entries(modules)) {
     const url = new URL(k);
     const { protocol, hostname, pathname } = url;
@@ -42,8 +43,13 @@ async function ensure(modules: Modules) {
     const writeLinkFile = async (mod: string) => {
       const modFile = path.join(dir, mod);
       const modDir = path.dirname(modFile);
+      let lockedVersion = v.version;
+      if (lockFile && lockFile[k] && lockFile[k].version) {
+        lockedVersion = lockFile[k].version
+      }
       const specifier = `${k}${v.version}${mod}`;
-      if (await fs.exists(modFile)) {
+      const hasLink = await fs.exists(modFile);
+      if (hasLink && v.version === lockedVersion) {
         console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
         return;
       }
@@ -62,10 +68,27 @@ async function ensure(modules: Modules) {
       console.log(`${green("Linked")}: ${specifier} -> ./${modFile}`);
     };
     await Promise.all(v.modules.map(writeLinkFile));
+    await generateLockFile(modules);
   }
 }
 
-const VERSION = "0.3.0";
+async function generateLockFile(modules: Modules) {
+  await Deno.writeFile("./modules-lock.json", new TextEncoder().encode(JSON.stringify(modules)));
+}
+
+async function readLockFile(): Promise<Modules | undefined> {
+  if (await fs.exists("./modules-lock.json")) {
+    const f = await Deno.readFile("./modules-lock.json");
+    const lock = JSON.parse(new TextDecoder().decode(f));
+    const err = [];
+    if (!isDinkModules(lock,err)) {
+      throw new Error("lock file may be saved as invalid format: "+err.join(","))
+    }
+    return lock
+  }
+}
+
+const VERSION = "0.4.0";
 
 type DinkOptions = {
   file?: string;
