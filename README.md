@@ -11,7 +11,7 @@ Managing URL module specifier in Deno is qutie hard. dink is designed to resolve
 # Install
 
 ```bash
-$ deno install dink https://denopkg.com/keroxp/dink/main.ts --allow-write --allow-read
+$ deno install dink https://denopkg.com/keroxp/dink/main.ts --allow-write --allow-read --allow-net
 ```
 
 # Usage
@@ -30,7 +30,7 @@ $ deno install dink https://denopkg.com/keroxp/dink/main.ts --allow-write --allo
 ## 2. Run `dink` command
 
 ```bash
-$ dink -A
+$ dink
 Linked: https://deno.land/std@v0.17.0/fs/mod.ts -> ./vendor/https/deno.land/std/fs/mod.ts
 Linked: https://deno.land/std@v0.17.0/fs/path.ts -> ./vendor/https/deno.land/std/fs/path.ts
 Linked: https://deno.land/std@v0.17.0/flags/mod.ts -> ./vendor/https/deno.land/std/flags/mod.ts
