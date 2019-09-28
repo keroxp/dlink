@@ -1,8 +1,8 @@
-#!/usr/bin/env deno --allow-write --allow-read
+#!/usr/bin/env deno --allow-write --allow-read --allow-net
 import * as path from "./vendor/https/deno.land/std/fs/path.ts";
 import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
-import { green, gray } from "./vendor/https/deno.land/std/fmt/colors.ts";
+import { green, gray, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
 import { Modules } from "./mod.ts";
 
 function isDinkModules(x, errors: string[]): x is Modules {
@@ -32,9 +32,43 @@ function isDinkModules(x, errors: string[]): x is Modules {
   return true;
 }
 
+async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
+  const removedFiles: string[] = [];
+  for (const [k, v] of Object.entries(lockFile)) {
+    const url = new URL(k);
+    const { protocol, hostname, pathname } = url;
+    const scheme = protocol.slice(0, protocol.length - 1);
+    const dir = path.join("./vendor", scheme, hostname, pathname);
+    if (!modules[k]) {
+      for (const i of v.modules) {
+        removedFiles.push(path.join(dir, i));
+      }
+    } else {
+      const mod = modules[k];
+      const set = new Set<string>(v.modules);
+      mod.modules.forEach(i => set.delete(i));
+      for (const i of set.values()) {
+        removedFiles.push(path.join(dir, i));
+      }
+    }
+  }
+  await Promise.all(
+    removedFiles.map(async i => {
+      await Deno.remove(i);
+      let dir = path.dirname(i);
+      while ((await Deno.readDir(dir)).length === 0) {
+        await Deno.remove(dir);
+        dir = path.dirname(dir);
+      }
+      console.log(`${red("Removed")}: ./${i}`);
+    })
+  );
+}
+
 async function ensure(modules: Modules) {
   const encoder = new TextEncoder();
   const lockFile = await readLockFile();
+  await deleteRemovedFiles(modules, lockFile);
   for (const [k, v] of Object.entries(modules)) {
     const url = new URL(k);
     const { protocol, hostname, pathname } = url;
@@ -45,7 +79,7 @@ async function ensure(modules: Modules) {
       const modDir = path.dirname(modFile);
       let lockedVersion = v.version;
       if (lockFile && lockFile[k] && lockFile[k].version) {
-        lockedVersion = lockFile[k].version
+        lockedVersion = lockFile[k].version;
       }
       const specifier = `${k}${v.version}${mod}`;
       const hasLink = await fs.exists(modFile);
@@ -73,7 +107,8 @@ async function ensure(modules: Modules) {
 }
 
 async function generateLockFile(modules: Modules) {
-  await Deno.writeFile("./modules-lock.json", new TextEncoder().encode(JSON.stringify(modules)));
+  const obj = new TextEncoder().encode(JSON.stringify(modules, null, "  "));
+  await Deno.writeFile("./modules-lock.json", obj);
 }
 
 async function readLockFile(): Promise<Modules | undefined> {
@@ -81,14 +116,16 @@ async function readLockFile(): Promise<Modules | undefined> {
     const f = await Deno.readFile("./modules-lock.json");
     const lock = JSON.parse(new TextDecoder().decode(f));
     const err = [];
-    if (!isDinkModules(lock,err)) {
-      throw new Error("lock file may be saved as invalid format: "+err.join(","))
+    if (!isDinkModules(lock, err)) {
+      throw new Error(
+        "lock file may be saved as invalid format: " + err.join(",")
+      );
     }
-    return lock
+    return lock;
   }
 }
 
-const VERSION = "0.4.0";
+const VERSION = "0.5.0";
 
 type DinkOptions = {
   file?: string;
