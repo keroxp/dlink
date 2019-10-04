@@ -54,6 +54,9 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
   }
   await Promise.all(
     removedFiles.map(async i => {
+      if (!(await fs.exists(i))) {
+        return;
+      }
       await Deno.remove(i);
       let dir = path.dirname(i);
       while ((await Deno.readDir(dir)).length === 0) {
