@@ -139,7 +139,25 @@ function writeLinkFile({
     console.log(`${green("Linked")}: ${specifier} -> ./${modFile}`);
   };
 }
-
+async function generateSkeletonFile() {
+  const resp = await fetch(
+    "https://api.github.com/repos/denoland/deno_std/tags"
+  );
+  const [latest] = await resp.json();
+  const bin = encoder.encode(
+    JSON.stringify(
+      {
+        "https://deno.land/std": {
+          version: `@${latest.name}`,
+          modules: ["/testing/mod.ts", "/testing/assert.ts"]
+        }
+      },
+      null,
+      "  "
+    )
+  );
+  await Deno.writeFile("./modules.json", bin);
+}
 async function generateLockFile(modules: Modules) {
   const obj = new TextEncoder().encode(JSON.stringify(modules, null, "  "));
   await Deno.writeFile("./modules-lock.json", obj);
@@ -206,8 +224,9 @@ async function main() {
     opts.file = args["f"];
   }
   if (!(await fs.exists(opts.file))) {
-    console.error(`${opts.file} does not exists`);
-    Deno.exit(1);
+    console.log("./modules.json not found. Creating skeleton...");
+    await generateSkeletonFile();
+    Deno.exit(0);
   }
   const file = await Deno.readFile(opts.file);
   const decoder = new TextDecoder();
