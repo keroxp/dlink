@@ -2,8 +2,15 @@
 import * as path from "./vendor/https/deno.land/std/fs/path.ts";
 import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
-import { green, gray, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
-import { Modules } from "./mod.ts";
+import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
+
+export type Module = {
+  version: string;
+  modules: string[];
+};
+export type Modules = {
+  [key: string]: Module;
+};
 
 function isDinkModules(x, errors: string[]): x is Modules {
   if (typeof x !== "object") {
@@ -67,48 +74,90 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
     })
   );
 }
+const encoder = new TextEncoder();
 
 async function ensure(modules: Modules) {
-  const encoder = new TextEncoder();
   const lockFile = await readLockFile();
   await deleteRemovedFiles(modules, lockFile);
-  for (const [k, v] of Object.entries(modules)) {
-    const url = new URL(k);
-    const { protocol, hostname, pathname } = url;
-    const scheme = protocol.slice(0, protocol.length - 1);
-    const dir = path.join("./vendor", scheme, hostname, pathname);
-    const writeLinkFile = async (mod: string) => {
-      const modFile = path.join(dir, mod);
-      const modDir = path.dirname(modFile);
-      let lockedVersion = v.version;
-      if (lockFile && lockFile[k] && lockFile[k].version) {
-        lockedVersion = lockFile[k].version;
-      }
-      const specifier = `${k}${v.version}${mod}`;
-      const hasLink = await fs.exists(modFile);
-      if (hasLink && v.version === lockedVersion) {
-        console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
-        return;
-      }
-      const resp = await fetch(specifier, { method: "HEAD" });
-      if (resp.status !== 200) {
-        throw new Error(`failed to fetch metadata for ${specifier}`);
-      }
-      const link = `export * from "${resp.url}";\n`;
-      await Deno.mkdir(modDir, true);
-      const f = await Deno.open(modFile, "w");
-      try {
-        await Deno.write(f.rid, encoder.encode(link));
-      } finally {
-        f.close();
-      }
-      console.log(`${green("Linked")}: ${specifier} -> ./${modFile}`);
-    };
-    await Promise.all(v.modules.map(writeLinkFile));
+  for (const [host, v] of Object.entries(modules)) {
+    await Promise.all(
+      v.modules.map(writeLinkFile({ host, version: v.version, lockFile }))
+    );
     await generateLockFile(modules);
   }
 }
 
+function writeLinkFile({
+  host,
+  version,
+  lockFile
+}: {
+  host: string;
+  version: string;
+  lockFile: Modules;
+}): (mod: string) => Promise<void> {
+  return async (mod: string) => {
+    const url = new URL(host);
+    const { protocol, hostname, pathname } = url;
+    const scheme = protocol.slice(0, protocol.length - 1);
+    const dir = path.join("./vendor", scheme, hostname, pathname);
+    const modFile = path.join(dir, mod);
+    const modDir = path.dirname(modFile);
+    let lockedVersion = version;
+    if (lockFile && lockFile[host] && lockFile[host].version) {
+      lockedVersion = lockFile[host].version;
+    }
+    const specifier = `${host}${version}${mod}`;
+    const hasLink = await fs.exists(modFile);
+    if (hasLink && version === lockedVersion) {
+      console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
+      return;
+    }
+    const resp = await fetch(specifier, { method: "GET" });
+    if (resp.status !== 200) {
+      throw new Error(`failed to fetch metadata for ${specifier}`);
+    }
+    const contentLength = parseInt(resp.headers.get("content-length") || "0");
+    if (contentLength > 10000000) {
+      throw new Error(`too big source file: ${contentLength}bytes`);
+    }
+    const code = await resp.text();
+    // Roughly search for export default declaration
+    const hasDefaultExport = !!code.match(/export[\s\t]*default[\s\t]/);
+    let link = `export * from "${resp.url}";\n`;
+    if (hasDefaultExport) {
+      link += `import {default as dew} from "${resp.url}";\n`;
+      link += `export default dew;\n`;
+    }
+    await Deno.mkdir(modDir, true);
+    const f = await Deno.open(modFile, "w");
+    try {
+      await Deno.write(f.rid, encoder.encode(link));
+    } finally {
+      f.close();
+    }
+    console.log(`${green("Linked")}: ${specifier} -> ./${modFile}`);
+  };
+}
+async function generateSkeletonFile() {
+  const resp = await fetch(
+    "https://api.github.com/repos/denoland/deno_std/tags"
+  );
+  const [latest] = await resp.json();
+  const bin = encoder.encode(
+    JSON.stringify(
+      {
+        "https://deno.land/std": {
+          version: `@${latest.name}`,
+          modules: ["/testing/mod.ts", "/testing/assert.ts"]
+        }
+      },
+      null,
+      "  "
+    )
+  );
+  await Deno.writeFile("./modules.json", bin);
+}
 async function generateLockFile(modules: Modules) {
   const obj = new TextEncoder().encode(JSON.stringify(modules, null, "  "));
   await Deno.writeFile("./modules-lock.json", obj);
@@ -128,7 +177,7 @@ async function readLockFile(): Promise<Modules | undefined> {
   }
 }
 
-const VERSION = "0.5.1";
+const VERSION = "0.6.0";
 
 type DinkOptions = {
   file?: string;
@@ -151,9 +200,7 @@ async function main() {
       String(`
     USAGE
 
-      dink -A
-        or
-      dink --allow-write --allow-read 
+      dink (just type ${green("dink")})
 
     ARGUMENTS
 
@@ -177,8 +224,9 @@ async function main() {
     opts.file = args["f"];
   }
   if (!(await fs.exists(opts.file))) {
-    console.error(`${opts.file} does not exists`);
-    Deno.exit(1);
+    console.log("./modules.json not found. Creating skeleton...");
+    await generateSkeletonFile();
+    Deno.exit(0);
   }
   const file = await Deno.readFile(opts.file);
   const decoder = new TextDecoder();
