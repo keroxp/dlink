@@ -104,7 +104,7 @@ function writeLinkFile({
     const modFile = path.join(dir, mod);
     const modDir = path.dirname(modFile);
     let lockedVersion = version;
-    if (lockFile && lockFile[host] && lockFile[host].version) {
+    if (lockFile[host] && lockFile[host].version) {
       lockedVersion = lockFile[host].version;
     }
     const specifier = `${host}${version}${mod}`;
@@ -149,7 +149,7 @@ async function generateSkeletonFile() {
       {
         "https://deno.land/std": {
           version: `@${latest.name}`,
-          modules: ["/testing/mod.ts", "/testing/assert.ts"]
+          modules: ["/testing/mod.ts", "/testing/asserts.ts"]
         }
       },
       null,
@@ -163,7 +163,7 @@ async function generateLockFile(modules: Modules) {
   await Deno.writeFile("./modules-lock.json", obj);
 }
 
-async function readLockFile(): Promise<Modules | undefined> {
+async function readLockFile(): Promise<Modules> {
   if (await fs.exists("./modules-lock.json")) {
     const f = await Deno.readFile("./modules-lock.json");
     const lock = JSON.parse(new TextDecoder().decode(f));
@@ -175,12 +175,13 @@ async function readLockFile(): Promise<Modules | undefined> {
     }
     return lock;
   }
+  return {};
 }
 
-const VERSION = "0.6.0";
+const VERSION = "0.6.1";
 
 type DinkOptions = {
-  file?: string;
+  file: string;
 };
 
 async function main() {
@@ -226,7 +227,6 @@ async function main() {
   if (!(await fs.exists(opts.file))) {
     console.log("./modules.json not found. Creating skeleton...");
     await generateSkeletonFile();
-    Deno.exit(0);
   }
   const file = await Deno.readFile(opts.file);
   const decoder = new TextDecoder();
