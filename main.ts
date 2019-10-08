@@ -2,6 +2,7 @@
 import * as path from "./vendor/https/deno.land/std/fs/path.ts";
 import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
+import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
 
 export type Module = {
@@ -124,10 +125,10 @@ function writeLinkFile({
     const code = await resp.text();
     // Roughly search for export default declaration
     const hasDefaultExport = !!code.match(/export[\s\t]*default[\s\t]/);
-    let link = `export * from "${resp.url}";\n`;
+    let link = sprintf('export * from "%s";\n', resp.url);
     if (hasDefaultExport) {
-      link += `import {default as dew} from "${resp.url}";\n`;
-      link += `export default dew;\n`;
+      link += sprintf('import {default as dew} from "%s";\n', resp.url);
+      link += "export default dew;\n";
     }
     await Deno.mkdir(modDir, true);
     const f = await Deno.open(modFile, "w");
