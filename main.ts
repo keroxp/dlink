@@ -8,6 +8,9 @@ import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
 export type Module = {
   version: string;
   modules: string[];
+  types?: {
+    [key: string]: string;
+  };
 };
 export type Modules = {
   [key: string]: Module;
@@ -79,25 +82,27 @@ const encoder = new TextEncoder();
 
 async function ensure(modules: Modules) {
   const lockFile = await readLockFile();
-  await deleteRemovedFiles(modules, lockFile);
-  for (const [host, v] of Object.entries(modules)) {
-    await Promise.all(
-      v.modules.map(writeLinkFile({ host, version: v.version, lockFile }))
-    );
+  if (lockFile) {
+    await deleteRemovedFiles(modules, lockFile);
+  }
+  for (const [host, module] of Object.entries(modules)) {
+    await writeLinkFiles({ host, module, lockFile });
     await generateLockFile(modules);
   }
 }
 
-function writeLinkFile({
+async function writeLinkFiles({
   host,
-  version,
+  module,
   lockFile
 }: {
   host: string;
-  version: string;
-  lockFile: Modules;
-}): (mod: string) => Promise<void> {
-  return async (mod: string) => {
+  module: Module;
+  lockFile?: Modules;
+}): Promise<void> {
+  const { version } = module;
+  const types = module.types || {};
+  const func = async (mod: string) => {
     const url = new URL(host);
     const { protocol, hostname, pathname } = url;
     const scheme = protocol.slice(0, protocol.length - 1);
@@ -105,12 +110,23 @@ function writeLinkFile({
     const modFile = path.join(dir, mod);
     const modDir = path.dirname(modFile);
     let lockedVersion = version;
-    if (lockFile[host] && lockFile[host].version) {
+    const typeFile = types[mod];
+    let lockedTypeFile = typeFile;
+    if (lockFile && lockFile[host]) {
       lockedVersion = lockFile[host].version;
+      const types = lockFile[host].types;
+      if (types) {
+        lockedTypeFile = types[mod];
+      }
     }
     const specifier = `${host}${version}${mod}`;
     const hasLink = await fs.exists(modFile);
-    if (hasLink && version === lockedVersion) {
+    if (
+      lockFile &&
+      hasLink &&
+      version === lockedVersion &&
+      typeFile === lockedTypeFile
+    ) {
       console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
       return;
     }
@@ -125,8 +141,26 @@ function writeLinkFile({
     const code = await resp.text();
     // Roughly search for export default declaration
     const hasDefaultExport = !!code.match(/export[\s\t]*default[\s\t]/);
-    let link = sprintf('export * from "%s";\n', resp.url);
+    let typeDefinition: string | undefined;
+    if (typeFile) {
+      if (typeFile.match(/^(file|https?):\/\//) || typeFile.startsWith("/")) {
+        // URL or absolute path
+        typeDefinition = `// @deno-types="${typeFile}"\n`;
+      } else {
+        // Relative
+        const v = path.relative(modDir, typeFile);
+        typeDefinition = `// @deno-types="${v}"\n`;
+      }
+    }
+    let link = "";
+    if (typeDefinition) {
+      link += typeDefinition;
+    }
+    link += sprintf('export * from "%s";\n', resp.url);
     if (hasDefaultExport) {
+      if (typeDefinition) {
+        link += typeDefinition;
+      }
       link += sprintf('import {default as dew} from "%s";\n', resp.url);
       link += "export default dew;\n";
     }
@@ -139,6 +173,7 @@ function writeLinkFile({
     }
     console.log(`${green("Linked")}: ${specifier} -> ./${modFile}`);
   };
+  await Promise.all(module.modules.map(func));
 }
 async function generateSkeletonFile() {
   const resp = await fetch(
@@ -150,7 +185,7 @@ async function generateSkeletonFile() {
       {
         "https://deno.land/std": {
           version: `@${latest.name}`,
-          modules: ["/testing/mod.ts", "/testing/asserts.ts"]
+          modules: ["/testing/mod.ts", "/testing/asserts.ts"],
         }
       },
       null,
@@ -164,7 +199,7 @@ async function generateLockFile(modules: Modules) {
   await Deno.writeFile("./modules-lock.json", obj);
 }
 
-async function readLockFile(): Promise<Modules> {
+async function readLockFile(): Promise<Modules | undefined> {
   if (await fs.exists("./modules-lock.json")) {
     const f = await Deno.readFile("./modules-lock.json");
     const lock = JSON.parse(new TextDecoder().decode(f));
@@ -176,10 +211,9 @@ async function readLockFile(): Promise<Modules> {
     }
     return lock;
   }
-  return {};
 }
 
-const VERSION = "0.6.1";
+const VERSION = "0.7.0";
 
 type DinkOptions = {
   file: string;
