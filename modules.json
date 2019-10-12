@@ -7,9 +7,6 @@
       "/flags/mod.ts",
       "/fmt/colors.ts",
       "/fmt/sprintf.ts"
-    ],
-    "types": {
-      "/fs/mod.ts": "./deno.dd.ts"
-    }
+    ]
   }
 }

@@ -109,9 +109,9 @@ async function writeLinkFiles({
     const dir = path.join("./vendor", scheme, hostname, pathname);
     const modFile = path.join(dir, mod);
     const modDir = path.dirname(modFile);
-    let lockedVersion = version;
+    let lockedVersion: string | undefined;
     const typeFile = types[mod];
-    let lockedTypeFile = typeFile;
+    let lockedTypeFile: string | undefined;
     if (lockFile && lockFile[host]) {
       lockedVersion = lockFile[host].version;
       const types = lockFile[host].types;
@@ -121,12 +121,7 @@ async function writeLinkFiles({
     }
     const specifier = `${host}${version}${mod}`;
     const hasLink = await fs.exists(modFile);
-    if (
-      lockFile &&
-      hasLink &&
-      version === lockedVersion &&
-      typeFile === lockedTypeFile
-    ) {
+    if (hasLink && version === lockedVersion && typeFile === lockedTypeFile) {
       console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
       return;
     }
@@ -185,7 +180,7 @@ async function generateSkeletonFile() {
       {
         "https://deno.land/std": {
           version: `@${latest.name}`,
-          modules: ["/testing/mod.ts", "/testing/asserts.ts"],
+          modules: ["/testing/mod.ts", "/testing/asserts.ts"]
         }
       },
       null,
