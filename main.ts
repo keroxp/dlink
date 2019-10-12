@@ -80,13 +80,13 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
 }
 const encoder = new TextEncoder();
 
-async function ensure(modules: Modules) {
+async function ensure(modules: Modules, opts: DinkOptions) {
   const lockFile = await readLockFile();
   if (lockFile) {
     await deleteRemovedFiles(modules, lockFile);
   }
   for (const [host, module] of Object.entries(modules)) {
-    await writeLinkFiles({ host, module, lockFile });
+    await writeLinkFiles({ host, module, lockFile, opts });
     await generateLockFile(modules);
   }
 }
@@ -94,11 +94,13 @@ async function ensure(modules: Modules) {
 async function writeLinkFiles({
   host,
   module,
-  lockFile
+  lockFile,
+  opts
 }: {
   host: string;
   module: Module;
   lockFile?: Modules;
+  opts: DinkOptions
 }): Promise<void> {
   const { version } = module;
   const types = module.types || {};
@@ -114,14 +116,14 @@ async function writeLinkFiles({
     let lockedTypeFile: string | undefined;
     if (lockFile && lockFile[host]) {
       lockedVersion = lockFile[host].version;
-      const types = lockFile[host].types;
-      if (types) {
-        lockedTypeFile = types[mod];
+      const lockedTypes = lockFile[host].types;
+      if (lockedTypes) {
+        lockedTypeFile = lockedTypes[mod];
       }
     }
     const specifier = `${host}${version}${mod}`;
     const hasLink = await fs.exists(modFile);
-    if (hasLink && version === lockedVersion && typeFile === lockedTypeFile) {
+    if (!opts.reload && hasLink && version === lockedVersion && typeFile === lockedTypeFile) {
       console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
       return;
     }
@@ -212,13 +214,15 @@ const VERSION = "0.7.0";
 
 type DinkOptions = {
   file: string;
+  reload: boolean
 };
 
 async function main() {
   const args = flags.parse(Deno.args, {
     alias: {
       h: "help",
-      V: "ver"
+      V: "ver",
+      R: "reload"
     },
     "--": true
   });
@@ -248,8 +252,10 @@ async function main() {
     );
     Deno.exit(0);
   }
+  let reload = !!(args["R"] || args["reload"]);
   const opts: DinkOptions = {
-    file: "./modules.json"
+    file: "./modules.json",
+    reload
   };
   if (args["f"]) {
     opts.file = args["f"];
@@ -266,7 +272,7 @@ async function main() {
     console.error(`${opts.file} has syntax error: ${errors.join(",")}`);
     Deno.exit(1);
   }
-  await ensure(json);
+  await ensure(json, opts);
   Deno.exit(0);
 }
 
