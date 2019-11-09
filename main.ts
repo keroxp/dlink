@@ -1,5 +1,5 @@
 #!/usr/bin/env deno --allow-write --allow-read --allow-net
-import * as path from "./vendor/https/deno.land/std/fs/path.ts";
+import * as path from "./vendor/https/deno.land/std/path/mod.ts";
 import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
 import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
@@ -142,7 +142,7 @@ function writeLinkFile({
 }
 async function generateSkeletonFile() {
   const resp = await fetch(
-    "https://api.github.com/repos/denoland/deno_std/tags"
+    "https://api.github.com/repos/denoland/tags"
   );
   const [latest] = await resp.json();
   const bin = encoder.encode(
