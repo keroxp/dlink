@@ -174,7 +174,7 @@ async function writeLinkFiles({
 }
 async function generateSkeletonFile() {
   const resp = await fetch(
-    "https://api.github.com/repos/denoland/tags"
+    "https://api.github.com/repos/denoland/deno/tags"
   );
   const [latest] = await resp.json();
   const bin = encoder.encode(
