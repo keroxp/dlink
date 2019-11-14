@@ -56,10 +56,10 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
       }
     } else {
       const mod = modules[k];
-      const set = new Set<string>(v.modules);
-      mod.modules.forEach(i => set.delete(i));
-      for (const i of set.values()) {
-        removedFiles.push(path.join(dir, i));
+      for (const i of v.modules) {
+        if (!mod.modules.includes(i)) {
+          removedFiles.push(path.join(dir, i));
+        }
       }
     }
   }
