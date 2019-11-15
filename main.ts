@@ -100,7 +100,7 @@ async function writeLinkFiles({
   host: string;
   module: Module;
   lockFile?: Modules;
-  opts: DinkOptions
+  opts: DinkOptions;
 }): Promise<void> {
   const { version } = module;
   const types = module.types || {};
@@ -123,7 +123,12 @@ async function writeLinkFiles({
     }
     const specifier = `${host}${version}${mod}`;
     const hasLink = await fs.exists(modFile);
-    if (!opts.reload && hasLink && version === lockedVersion && typeFile === lockedTypeFile) {
+    if (
+      !opts.reload &&
+      hasLink &&
+      version === lockedVersion &&
+      typeFile === lockedTypeFile
+    ) {
       console.log(gray(`Linked: ${specifier} -> ./${modFile}`));
       return;
     }
@@ -173,9 +178,7 @@ async function writeLinkFiles({
   await Promise.all(module.modules.map(func));
 }
 async function generateSkeletonFile() {
-  const resp = await fetch(
-    "https://api.github.com/repos/denoland/deno/tags"
-  );
+  const resp = await fetch("https://api.github.com/repos/denoland/deno/tags");
   const [latest] = await resp.json();
   const bin = encoder.encode(
     JSON.stringify(
@@ -214,7 +217,7 @@ const VERSION = "0.7.0";
 
 type DinkOptions = {
   file: string;
-  reload: boolean
+  reload: boolean;
 };
 
 async function main() {
