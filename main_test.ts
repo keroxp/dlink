@@ -3,7 +3,6 @@ import {
   assert
 } from "./vendor/https/deno.land/std/testing/asserts.ts";
 import { runIfMain, test } from "./vendor/https/deno.land/std/testing/mod.ts";
-import * as path from "./vendor/https/deno.land/std/path/mod.ts";
 async function beforeEach() {
   const tmpDir = await Deno.makeTempDir();
   await Deno.run({
@@ -24,13 +23,21 @@ async function runDink(dir: string) {
   assertEquals(resp.code, 0);
 }
 
+const printIndent = (indent: number): string => {
+  let ret = "";
+  for (let i = 0; i < indent; i++) ret += "  ";
+  return ret;
+};
+
 async function treeDir(dir: string, dest: { text: string }, depth = 0) {
-  const files = await Deno.readDir(dir);
-  const printIndent = (indent: number): string => {
-    let ret = "";
-    for (let i = 0; i < indent; i++) ret += "  ";
-    return ret;
-  };
+  let files = await Deno.readDir(dir);
+  files = files.sort((a, b) => {
+    if (a.isDirectory() === b.isDirectory()) {
+      return a.name.localeCompare(b.name);
+    } else {
+      return a.isDirectory() ? 1 : -1;
+    }
+  });
   for (const i of files) {
     dest.text += printIndent(depth + 1) + i.name + "\n";
     if (i.isDirectory()) {
@@ -61,8 +68,8 @@ test("basic", async () => {
       deno.land
         std
           testing
-            mod.ts
             asserts.ts
+            mod.ts
 `
   );
 });
@@ -79,8 +86,8 @@ test("basic_no_lock", async () => {
       deno.land
         std
           testing
-            mod.ts
             asserts.ts
+            mod.ts
 `
   );
 });
@@ -128,8 +135,8 @@ test("removed_from_dir", async () => {
       deno.land
         std
           testing
-            mod.ts
             asserts.ts
+            mod.ts
 `
   );
 });
@@ -146,8 +153,8 @@ test("removed_from_dir_all", async () => {
       deno.land
         std
           testing
-            mod.ts
             asserts.ts
+            mod.ts
 `
   );
 });
