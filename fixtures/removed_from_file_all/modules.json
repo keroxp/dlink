@@ -1,0 +1,7 @@
+{
+  "https://deno.land/std": {
+    "version": "@v0.25.0",
+    "modules": [
+    ]
+  }
+}

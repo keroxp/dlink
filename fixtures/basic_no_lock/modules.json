@@ -2,11 +2,6 @@
   "https://deno.land/std": {
     "version": "@v0.25.0",
     "modules": [
-      "/fs/mod.ts",
-      "/path/mod.ts",
-      "/flags/mod.ts",
-      "/fmt/colors.ts",
-      "/fmt/sprintf.ts",
       "/testing/mod.ts",
       "/testing/asserts.ts"
     ]
