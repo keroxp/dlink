@@ -115,6 +115,43 @@ test("removed_from_file_all", async () => {
   );
 });
 
+test("removed_from_dir", async () => {
+  const dir = fixturesDir + "/removed_from_dir";
+  await runDink(dir);
+  await assertDir(
+    dir,
+    `
+  modules-lock.json
+  modules.json
+  vendor
+    https
+      deno.land
+        std
+          testing
+            mod.ts
+            asserts.ts
+`
+  );
+});
+test("removed_from_dir_all", async () => {
+  const dir = fixturesDir + "/removed_from_dir_all";
+  await runDink(dir);
+  await assertDir(
+    dir,
+    `
+  modules-lock.json
+  modules.json
+  vendor
+    https
+      deno.land
+        std
+          testing
+            mod.ts
+            asserts.ts
+`
+  );
+});
+
 runIfMain(import.meta).finally(async () => {
   await Deno.remove(fixturesDir, { recursive: true });
 });
