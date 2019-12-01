@@ -63,20 +63,24 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
       }
     }
   }
-  await Promise.all(
-    removedFiles.map(async i => {
-      if (!(await fs.exists(i))) {
-        return;
-      }
-      await Deno.remove(i);
-      let dir = path.dirname(i);
-      while ((await Deno.readDir(dir)).length === 0) {
-        await Deno.remove(dir);
-        dir = path.dirname(dir);
-      }
-      console.log(`${red("Removed")}: ./${i}`);
-    })
-  );
+  const removeFileDirs: string[] = [];
+  // Remove unlinked files
+  for (const file of removedFiles) {
+    const dir = path.dirname(file);
+    await Deno.remove(file);
+    console.log(`${red("Removed")}: ./${file}`);
+    removeFileDirs.push(dir);
+  }
+  // Clean up empty dirs
+  let dir: string | undefined;
+  while ((dir = removeFileDirs.pop()) && dir !== "vendor") {
+    const list = await Deno.readDir(dir);
+    if (list.length === 0) {
+      await Deno.remove(dir);
+      const parentDir = path.dirname(dir);
+      removeFileDirs.push(parentDir);
+    }
+  }
 }
 const encoder = new TextEncoder();
 
