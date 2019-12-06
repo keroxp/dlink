@@ -217,7 +217,7 @@ async function readLockFile(): Promise<Modules | undefined> {
   }
 }
 
-const VERSION = "0.7.0";
+const VERSION = "0.7.1";
 
 type DinkOptions = {
   file: string;
