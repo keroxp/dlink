@@ -15,7 +15,13 @@ Managing URL module specifier in Deno is qutie hard. dink is designed to resolve
 # Install
 
 ```bash
-$ deno install dink https://denopkg.com/keroxp/dink/main.ts --allow-write --allow-read --allow-net
+$ deno install --allow-write --allow-read --allow-net dink https://denopkg.com/keroxp/dink/main.ts
+```
+
+with install directory:
+
+```bash
+$ deno install --allow-write --allow-read --allow-net -d /usr/local/bin dink https://denopkg.com/keroxp/dink/main.ts
 ```
 
 # Usage
@@ -25,7 +31,7 @@ $ deno install dink https://denopkg.com/keroxp/dink/main.ts --allow-write --allo
 ```json
 {
   "https://deno.land/std": {
-    "version": "@v0.17.0",
+    "version": "@v0.32.0",
     "modules": ["/fs/mod.ts", "/fs/path.ts", "/flags/mod.ts"]
   }
 }
@@ -35,9 +41,9 @@ $ deno install dink https://denopkg.com/keroxp/dink/main.ts --allow-write --allo
 
 ```bash
 $ dink
-Linked: https://deno.land/std@v0.17.0/fs/mod.ts -> ./vendor/https/deno.land/std/fs/mod.ts
-Linked: https://deno.land/std@v0.17.0/fs/path.ts -> ./vendor/https/deno.land/std/fs/path.ts
-Linked: https://deno.land/std@v0.17.0/flags/mod.ts -> ./vendor/https/deno.land/std/flags/mod.ts
+Linked: https://deno.land/std@v0.32.0/fs/mod.ts -> ./vendor/https/deno.land/std/fs/mod.ts
+Linked: https://deno.land/std@v0.32.0/fs/path.ts -> ./vendor/https/deno.land/std/fs/path.ts
+Linked: https://deno.land/std@v0.32.0/flags/mod.ts -> ./vendor/https/deno.land/std/flags/mod.ts
 ```
 
 dink will automatically create module asias files that are described in `modules.json`. If there are `modules.json` like below:
