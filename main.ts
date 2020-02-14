@@ -4,6 +4,7 @@ import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
 import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
+const VERSION = "0.8.0";
 
 export type Module = {
   version: string;
@@ -216,8 +217,6 @@ async function readLockFile(): Promise<Modules | undefined> {
     return lock;
   }
 }
-
-const VERSION = "0.7.2";
 
 type DinkOptions = {
   file: string;
