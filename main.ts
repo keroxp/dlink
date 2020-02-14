@@ -189,7 +189,7 @@ async function generateSkeletonFile() {
       {
         "https://deno.land/std": {
           version: `@${latest.name}`,
-          modules: ["/testing/mod.ts", "/testing/asserts.ts"]
+          modules: ["/testing/asserts.ts"]
         }
       },
       null,

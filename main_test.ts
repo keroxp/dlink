@@ -2,7 +2,8 @@ import {
   assertEquals,
   assert
 } from "./vendor/https/deno.land/std/testing/asserts.ts";
-import { runIfMain, test } from "./vendor/https/deno.land/std/testing/mod.ts";
+const { test } = Deno;
+
 async function beforeEach() {
   const tmpDir = await Deno.makeTempDir();
   await Deno.run({
@@ -12,7 +13,7 @@ async function beforeEach() {
   return tmpDir + "/fixtures";
 }
 const fixturesDir = await beforeEach();
-const dirname = new URL(".", import.meta.url);
+const dirname = new URL(".", import.meta.url).pathname;
 async function runDink(dir: string) {
   const resp = await Deno.run({
     args: [Deno.execPath(), "-A", dirname + "/main.ts"],
@@ -159,6 +160,6 @@ test("removed_from_dir_all", async () => {
   );
 });
 
-runIfMain(import.meta).finally(async () => {
+test("beforeAll", async () => {
   await Deno.remove(fixturesDir, { recursive: true });
 });
