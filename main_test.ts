@@ -34,7 +34,14 @@ async function treeDir(dir: string, dest: { text: string }, depth = 0) {
   let files = await Deno.readDir(dir);
   files = files.sort((a, b) => {
     if (a.isDirectory() === b.isDirectory()) {
-      return a.name.localeCompare(b.name);
+      if (a.name && b.name) {
+        return a.name?.localeCompare(b.name);
+      } else if (a.name) {
+        return -1
+      } else if (b.name) {
+        return 1;
+      }
+      return 0;
     } else {
       return a.isDirectory() ? 1 : -1;
     }
