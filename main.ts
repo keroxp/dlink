@@ -4,7 +4,7 @@ import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
 import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
-const VERSION = "0.8.0";
+const VERSION = "0.8.1";
 
 export type Module = {
   version: string;
@@ -17,7 +17,7 @@ export type Modules = {
   [key: string]: Module;
 };
 
-function isDinkModules(x, errors: string[]): x is Modules {
+function isDinkModules(x: any, errors: string[]): x is Modules {
   if (typeof x !== "object") {
     errors.push("is not object");
     return false;
@@ -208,7 +208,7 @@ async function readLockFile(): Promise<Modules | undefined> {
   if (await fs.exists("./modules-lock.json")) {
     const f = await Deno.readFile("./modules-lock.json");
     const lock = JSON.parse(new TextDecoder().decode(f));
-    const err = [];
+    const err = Array<string>();
     if (!isDinkModules(lock, err)) {
       throw new Error(
         "lock file may be saved as invalid format: " + err.join(",")
@@ -273,7 +273,7 @@ async function main() {
   const file = await Deno.readFile(opts.file);
   const decoder = new TextDecoder();
   const json = JSON.parse(decoder.decode(file)) as Modules;
-  const errors = [];
+  const errors = Array<string>();
   if (!isDinkModules(json, errors)) {
     console.error(`${opts.file} has syntax error: ${errors.join(",")}`);
     Deno.exit(1);
