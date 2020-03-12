@@ -13,7 +13,7 @@ jobs:
         DENO_VERSION=$(cat .denov)
         curl -fsSL https://deno.land/x/install/install.sh | bash -s -- ${DENO_VERSION}
     - name: Check And Bump
-      uses: keroxp/dink-bot@v0.3.3
+      uses: keroxp/dink-bot@v0.3.5
       with:
         github-repository: ${{ github.repository }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
