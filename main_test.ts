@@ -31,13 +31,13 @@ const printIndent = (indent: number): string => {
 };
 
 async function treeDir(dir: string, dest: { text: string }, depth = 0) {
-  let files = await Deno.readDir(dir);
+  let files = await Deno.readdir(dir);
   files = files.sort((a, b) => {
     if (a.isDirectory() === b.isDirectory()) {
       if (a.name && b.name) {
         return a.name?.localeCompare(b.name);
       } else if (a.name) {
-        return -1
+        return -1;
       } else if (b.name) {
         return 1;
       }

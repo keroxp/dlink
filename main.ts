@@ -75,7 +75,7 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
   // Clean up empty dirs
   let dir: string | undefined;
   while ((dir = removeFileDirs.pop()) && dir !== "vendor") {
-    const list = await Deno.readDir(dir);
+    const list = await Deno.readdir(dir);
     if (list.length === 0) {
       await Deno.remove(dir);
       const parentDir = path.dirname(dir);
