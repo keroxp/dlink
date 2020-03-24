@@ -4,7 +4,7 @@ import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
 import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
-const VERSION = "0.8.3";
+const VERSION = "0.8.4";
 
 export type Module = {
   version: string;
