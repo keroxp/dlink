@@ -6,20 +6,23 @@ const { test } = Deno;
 
 async function beforeEach() {
   const tmpDir = await Deno.makeTempDir();
-  await Deno.run({
-    args: ["cp", "-R", "fixtures", tmpDir]
-  }).status();
+  const p = Deno.run({
+    cmd: ["cp", "-R", "fixtures", tmpDir]
+  });
+  await p.status();
+  p.close();
   // console.log(tmpDir);
   return tmpDir + "/fixtures";
 }
 const fixturesDir = await beforeEach();
 const dirname = new URL(".", import.meta.url).pathname;
 async function runDink(dir: string) {
-  const resp = await Deno.run({
-    args: [Deno.execPath(), "-A", dirname + "/main.ts"],
+  const p = await Deno.run({
+    cmd: [Deno.execPath(), "-A", dirname + "/main.ts"],
     cwd: dir
-    // stdout: "piped"
-  }).status();
+  });
+  const resp = await p.status();
+  p.close();
   assertEquals(resp.success, true);
   assertEquals(resp.code, 0);
 }
