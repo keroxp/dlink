@@ -100,7 +100,7 @@ async function writeLinkFiles({
   host,
   module,
   lockFile,
-  opts
+  opts,
 }: {
   host: string;
   module: Module;
@@ -190,12 +190,12 @@ async function generateSkeletonFile() {
       {
         "https://deno.land/std": {
           version: `@${latest.name}`,
-          modules: ["/testing/asserts.ts"]
-        }
+          modules: ["/testing/asserts.ts"],
+        },
       },
       null,
-      "  "
-    )
+      "  ",
+    ),
   );
   await Deno.writeFile("./modules.json", bin);
 }
@@ -211,7 +211,7 @@ async function readLockFile(): Promise<Modules | undefined> {
     const err = Array<string>();
     if (!isDinkModules(lock, err)) {
       throw new Error(
-        "lock file may be saved as invalid format: " + err.join(",")
+        "lock file may be saved as invalid format: " + err.join(","),
       );
     }
     return lock;
@@ -228,9 +228,9 @@ async function main() {
     alias: {
       h: "help",
       V: "ver",
-      R: "reload"
+      R: "reload",
     },
-    "--": true
+    "--": true,
   });
   if (args["V"] || args["ver"]) {
     console.log(VERSION);
@@ -254,14 +254,14 @@ async function main() {
       -h, --help         Display help
       -V, --ver          Display version
          
-    `)
+    `),
     );
     Deno.exit(0);
   }
   let reload = !!(args["R"] || args["reload"]);
   const opts: DinkOptions = {
     file: "./modules.json",
-    reload
+    reload,
   };
   if (args["f"]) {
     opts.file = args["f"];
