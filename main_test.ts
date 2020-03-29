@@ -7,7 +7,7 @@ const { test } = Deno;
 async function beforeEach() {
   const tmpDir = await Deno.makeTempDir();
   const p = Deno.run({
-    cmd: ["cp", "-R", "fixtures", tmpDir]
+    cmd: ["cp", "-R", "fixtures", tmpDir],
   });
   await p.status();
   p.close();
@@ -19,7 +19,7 @@ const dirname = new URL(".", import.meta.url).pathname;
 async function runDink(dir: string) {
   const p = await Deno.run({
     cmd: [Deno.execPath(), "-A", dirname + "/main.ts"],
-    cwd: dir
+    cwd: dir,
   });
   const resp = await p.status();
   p.close();
@@ -81,7 +81,7 @@ test("basic", async () => {
           testing
             asserts.ts
             mod.ts
-`
+`,
   );
 });
 test("basic_no_lock", async () => {
@@ -99,7 +99,7 @@ test("basic_no_lock", async () => {
           testing
             asserts.ts
             mod.ts
-`
+`,
   );
 });
 test("removed_from_file", async () => {
@@ -116,7 +116,7 @@ test("removed_from_file", async () => {
         std
           testing
             mod.ts
-`
+`,
   );
 });
 
@@ -129,7 +129,7 @@ test("removed_from_file_all", async () => {
   modules-lock.json
   modules.json
   vendor
-`
+`,
   );
 });
 
@@ -148,7 +148,7 @@ test("removed_from_dir", async () => {
           testing
             asserts.ts
             mod.ts
-`
+`,
   );
 });
 test("removed_from_dir_all", async () => {
@@ -166,7 +166,7 @@ test("removed_from_dir_all", async () => {
           testing
             asserts.ts
             mod.ts
-`
+`,
   );
 });
 
