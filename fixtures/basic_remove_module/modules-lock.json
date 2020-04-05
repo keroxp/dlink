@@ -1,0 +1,14 @@
+{
+  "https://deno.land/std": {
+    "version": "@v0.39.0",
+    "modules": [
+      "/testing/asserts.ts"
+    ]
+  },
+  "https://servestjs.org/@": {
+    "version": "v0.9.3",
+    "modules": [
+      "/jsx.ts"
+    ]
+  }
+}
