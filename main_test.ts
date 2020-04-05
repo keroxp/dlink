@@ -102,6 +102,43 @@ test("basic_no_lock", async () => {
 `,
   );
 });
+
+test("basic_remove_dir", async () => {
+  const dir = fixturesDir + "/basic_remove_dir";
+  await runDink(dir);
+  await assertDir(
+    dir,
+    `
+  modules-lock.json
+  modules.json
+  vendor
+    https
+      deno.land
+        std
+          testing
+            asserts.ts
+`,
+  );
+});
+
+test("basic_remove_module", async () => {
+  const dir = fixturesDir + "/basic_remove_module";
+  await runDink(dir);
+  await assertDir(
+    dir,
+    `
+  modules-lock.json
+  modules.json
+  vendor
+    https
+      deno.land
+        std
+          testing
+            asserts.ts
+`,
+  );
+});
+
 test("removed_from_file", async () => {
   const dir = fixturesDir + "/removed_from_file";
   await runDink(dir);
@@ -151,6 +188,7 @@ test("removed_from_dir", async () => {
 `,
   );
 });
+
 test("removed_from_dir_all", async () => {
   const dir = fixturesDir + "/removed_from_dir_all";
   await runDink(dir);
@@ -166,6 +204,26 @@ test("removed_from_dir_all", async () => {
           testing
             asserts.ts
             mod.ts
+`,
+  );
+});
+
+test("removed_dir", async () => {
+  const dir = fixturesDir + "/removed_dir";
+  await runDink(dir);
+  await assertDir(
+    dir,
+    `
+  modules-lock.json
+  modules.json
+  vendor
+    https
+      deno.land
+        std
+          fmt
+            colors.ts
+          testing
+            asserts.ts
 `,
   );
 });
