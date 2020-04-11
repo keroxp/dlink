@@ -1,3 +1,3 @@
 test:
-	deno fetch main.ts
+	deno cache main.ts
 	deno test -A main_test.ts
