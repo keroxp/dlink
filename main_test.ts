@@ -34,7 +34,7 @@ const printIndent = (indent: number): string => {
 };
 
 async function treeDir(dir: string, dest: { text: string }, depth = 0) {
-  let files = [...Deno.readdirSync(dir)];
+  let files = [...Deno.readDirSync(dir)];
   files = files.sort((a, b) => {
     if (a.isDirectory === b.isDirectory) {
       if (a.name && b.name) {

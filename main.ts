@@ -76,7 +76,7 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
   let dir: string | undefined;
   while ((dir = removeFileDirs.pop()) && dir !== "vendor") {
     let fileCount = 0;
-    for await (const _ of Deno.readdir(dir)) {
+    for await (const _ of Deno.readDir(dir)) {
       fileCount++;
     }
     if (fileCount === 0) {
@@ -175,7 +175,7 @@ async function writeLinkFiles({
       link += "export default dew;\n";
     }
     await Deno.mkdir(modDir, { recursive: true });
-    const f = await Deno.open(modFile, "w");
+    const f = await Deno.open(modFile, { create: true, write: true });
     try {
       await Deno.write(f.rid, encoder.encode(link));
     } finally {
