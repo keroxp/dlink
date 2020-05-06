@@ -15,18 +15,25 @@ Managing URL module specifier in Deno is qutie hard. dink is designed to resolve
 # Install
 
 ```bash
-$ deno install --allow-write --allow-read --allow-net dink https://denopkg.com/keroxp/dink/main.ts
+$ deno install --allow-write --allow-read --allow-net https://denopkg.com/keroxp/dink/dink.ts
 ```
 
 with install directory:
 
 ```bash
-$ deno install --allow-write --allow-read --allow-net -d /usr/local/bin dink https://denopkg.com/keroxp/dink/main.ts
+$ deno install --allow-write --allow-read --allow-net -d /usr/local/bin dink https://denopkg.com/keroxp/dink/dink.ts
 ```
 
 # Usage
 
-## 1. Create `modules.json` file
+## 1. Run `dink`
+
+```bash
+$ cd ./project
+$ dink
+```
+
+## 2. Edit `modules.json` file
 
 ```json
 {
