@@ -1,6 +1,6 @@
 #!/usr/bin/env deno --allow-write --allow-read --allow-net
 import * as path from "./vendor/https/deno.land/std/path/mod.ts";
-import * as fs from "./vendor/https/deno.land/std/fs/mod.ts";
+import { exists } from "./vendor/https/deno.land/std/fs/exists.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
 import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
@@ -68,9 +68,11 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
   // Remove unlinked files
   for (const file of removedFiles) {
     const dir = path.dirname(file);
-    await Deno.remove(file);
-    console.log(`${red("Removed")}: ./${file}`);
-    removeFileDirs.push(dir);
+    if (await exists(file)) {
+      await Deno.remove(file);
+      console.log(`${red("Removed")}: ./${file}`);
+      removeFileDirs.push(dir);
+    }
   }
   // Clean up empty dirs
   let dir: string | undefined;
@@ -130,7 +132,7 @@ async function writeLinkFiles({
       }
     }
     const specifier = `${host}${version}${mod}`;
-    const hasLink = await fs.exists(modFile);
+    const hasLink = await exists(modFile);
     if (
       !opts.reload &&
       hasLink &&
@@ -208,7 +210,7 @@ async function generateLockFile(modules: Modules) {
 }
 
 async function readLockFile(): Promise<Modules | undefined> {
-  if (await fs.exists("./modules-lock.json")) {
+  if (await exists("./modules-lock.json")) {
     const f = await Deno.readFile("./modules-lock.json");
     const lock = JSON.parse(new TextDecoder().decode(f));
     const err = Array<string>();
@@ -269,7 +271,7 @@ async function main() {
   if (args["f"]) {
     opts.file = args["f"];
   }
-  if (!(await fs.exists(opts.file))) {
+  if (!(await exists(opts.file))) {
     console.log("./modules.json not found. Creating skeleton...");
     await generateSkeletonFile();
   }
