@@ -18,7 +18,7 @@ const fixturesDir = await beforeEach();
 const dirname = new URL(".", import.meta.url).pathname;
 async function runDink(dir: string) {
   const p = await Deno.run({
-    cmd: [Deno.execPath(), "run", "-A", dirname + "/main.ts"],
+    cmd: [Deno.execPath(), "run", "-A", dirname + "/dink.ts"],
     cwd: dir,
   });
   const resp = await p.status();
