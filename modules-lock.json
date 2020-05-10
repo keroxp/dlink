@@ -1,6 +1,6 @@
 {
   "https://deno.land/std": {
-    "version": "@v1.0.0-rc1",
+    "version": "@v0.50.0",
     "modules": [
       "/fs/exists.ts",
       "/path/mod.ts",

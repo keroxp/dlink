@@ -1,4 +1,4 @@
-#!/usr/bin/env deno --allow-write --allow-read --allow-net
+#!/usr/bin/env deno run --allow-write --allow-read --allow-net
 import * as path from "./vendor/https/deno.land/std/path/mod.ts";
 import { exists } from "./vendor/https/deno.land/std/fs/exists.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
@@ -188,13 +188,16 @@ async function writeLinkFiles({
   await Promise.all(module.modules.map(func));
 }
 async function generateSkeletonFile() {
-  const resp = await fetch("https://api.github.com/repos/denoland/deno/tags");
-  const [latest] = await resp.json();
+  // Currently no way to fetch latest std release
+  // because core and std release cycles were separated
+  // const resp = await fetch("https://api.github.com/repos/denoland/deno/tags");
+  // const json = await resp.json();
+  // const [latest] = json;
   const bin = encoder.encode(
     JSON.stringify(
       {
         "https://deno.land/std": {
-          version: `@${latest.name}`,
+          version: `@v0.50.0`,
           modules: ["/testing/asserts.ts"],
         },
       },
