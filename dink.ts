@@ -4,7 +4,7 @@ import { exists } from "./vendor/https/deno.land/std/fs/exists.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
 import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
-const VERSION = "0.8.4";
+const VERSION = "0.8.5";
 
 export type Module = {
   version: string;
@@ -177,7 +177,11 @@ async function writeLinkFiles({
       link += "export default dew;\n";
     }
     await Deno.mkdir(modDir, { recursive: true });
-    const f = await Deno.open(modFile, { create: true, write: true });
+    const f = await Deno.open(modFile, {
+      create: true,
+      write: true,
+      truncate: true
+    });
     try {
       await Deno.write(f.rid, encoder.encode(link));
     } finally {
