@@ -80,7 +80,6 @@ test("basic", async () => {
         std
           testing
             asserts.ts
-            mod.ts
 `,
   );
 });
@@ -98,7 +97,6 @@ test("basic_no_lock", async () => {
         std
           testing
             asserts.ts
-            mod.ts
 `,
   );
 });
@@ -152,7 +150,7 @@ test("removed_from_file", async () => {
       deno.land
         std
           testing
-            mod.ts
+            asserts.ts
 `,
   );
 });
@@ -184,7 +182,7 @@ test("removed_from_dir", async () => {
         std
           testing
             asserts.ts
-            mod.ts
+            diff.ts
 `,
   );
 });
@@ -203,7 +201,7 @@ test("removed_from_dir_all", async () => {
         std
           testing
             asserts.ts
-            mod.ts
+            diff.ts
 `,
   );
 });

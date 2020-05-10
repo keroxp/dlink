@@ -1,4 +1,4 @@
-#!/usr/bin/env deno --allow-write --allow-read --allow-net
+#!/usr/bin/env deno run --allow-write --allow-read --allow-net
 import * as path from "./vendor/https/deno.land/std/path/mod.ts";
 import { exists } from "./vendor/https/deno.land/std/fs/exists.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
