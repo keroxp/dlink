@@ -180,7 +180,7 @@ async function writeLinkFiles({
     const f = await Deno.open(modFile, {
       create: true,
       write: true,
-      truncate: true
+      truncate: true,
     });
     try {
       await Deno.write(f.rid, encoder.encode(link));
