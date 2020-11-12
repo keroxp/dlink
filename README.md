@@ -1,4 +1,4 @@
-# dlink
+# 🍹dlink 🦕
 
 [![Build Status](https://github.com/keroxp/dlink/workflows/CI/badge.svg)](https://github.com/keroxp/dlink/actions)
 ![https://img.shields.io/github/tag/keroxp/dlink.svg](https://img.shields.io/github/tag/keroxp/dlink.svg)
