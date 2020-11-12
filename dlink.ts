@@ -2,7 +2,7 @@
 import * as path from "./vendor/https/deno.land/std/path/mod.ts";
 import { exists } from "./vendor/https/deno.land/std/fs/exists.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
-import { sprintf } from "./vendor/https/deno.land/std/fmt/sprintf.ts";
+import { sprintf } from "./vendor/https/deno.land/std/fmt/printf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
 const VERSION = "0.8.5";
 

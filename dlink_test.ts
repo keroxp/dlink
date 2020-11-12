@@ -1,6 +1,6 @@
 import {
-  assertEquals,
   assert,
+  assertEquals,
 } from "./vendor/https/deno.land/std/testing/asserts.ts";
 const { test } = Deno;
 
