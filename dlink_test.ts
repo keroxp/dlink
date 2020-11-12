@@ -16,9 +16,9 @@ async function beforeEach() {
 }
 const fixturesDir = await beforeEach();
 const dirname = new URL(".", import.meta.url).pathname;
-async function runDink(dir: string) {
+async function runDlink(dir: string) {
   const p = await Deno.run({
-    cmd: [Deno.execPath(), "run", "-A", dirname + "/dink.ts"],
+    cmd: [Deno.execPath(), "run", "-A", dirname + "/dlink.ts"],
     cwd: dir,
   });
   const resp = await p.status();
@@ -68,7 +68,7 @@ async function assertDir(dir: string, exp: string) {
 }
 test("basic", async () => {
   const dir = fixturesDir + "/basic";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -85,7 +85,7 @@ test("basic", async () => {
 });
 test("basic_no_lock", async () => {
   const dir = fixturesDir + "/basic_no_lock";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -103,7 +103,7 @@ test("basic_no_lock", async () => {
 
 test("basic_remove_dir", async () => {
   const dir = fixturesDir + "/basic_remove_dir";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -121,7 +121,7 @@ test("basic_remove_dir", async () => {
 
 test("basic_remove_module", async () => {
   const dir = fixturesDir + "/basic_remove_module";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -139,7 +139,7 @@ test("basic_remove_module", async () => {
 
 test("removed_from_file", async () => {
   const dir = fixturesDir + "/removed_from_file";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -157,7 +157,7 @@ test("removed_from_file", async () => {
 
 test("removed_from_file_all", async () => {
   const dir = fixturesDir + "/removed_from_file_all";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -170,7 +170,7 @@ test("removed_from_file_all", async () => {
 
 test("removed_from_dir", async () => {
   const dir = fixturesDir + "/removed_from_dir";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -189,7 +189,7 @@ test("removed_from_dir", async () => {
 
 test("removed_from_dir_all", async () => {
   const dir = fixturesDir + "/removed_from_dir_all";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `
@@ -208,7 +208,7 @@ test("removed_from_dir_all", async () => {
 
 test("removed_dir", async () => {
   const dir = fixturesDir + "/removed_dir";
-  await runDink(dir);
+  await runDlink(dir);
   await assertDir(
     dir,
     `

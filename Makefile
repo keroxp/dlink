@@ -1,3 +1,3 @@
 test:
-	deno cache dink.ts
+	deno cache dlink.ts
 	deno test -A

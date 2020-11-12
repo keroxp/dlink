@@ -17,7 +17,7 @@ export type Modules = {
   [key: string]: Module;
 };
 
-function isDinkModules(x: any, errors: string[]): x is Modules {
+function isDlinkModules(x: any, errors: string[]): x is Modules {
   if (typeof x !== "object") {
     errors.push("is not object");
     return false;
@@ -90,7 +90,7 @@ async function deleteRemovedFiles(modules: Modules, lockFile: Modules) {
 }
 const encoder = new TextEncoder();
 
-async function ensure(modules: Modules, opts: DinkOptions) {
+async function ensure(modules: Modules, opts: DlinkOptions) {
   const lockFile = await readLockFile();
   if (lockFile) {
     await deleteRemovedFiles(modules, lockFile);
@@ -110,7 +110,7 @@ async function writeLinkFiles({
   host: string;
   module: Module;
   lockFile?: Modules;
-  opts: DinkOptions;
+  opts: DlinkOptions;
 }): Promise<void> {
   const { version } = module;
   const types = module.types || {};
@@ -221,7 +221,7 @@ async function readLockFile(): Promise<Modules | undefined> {
     const f = await Deno.readFile("./modules-lock.json");
     const lock = JSON.parse(new TextDecoder().decode(f));
     const err = Array<string>();
-    if (!isDinkModules(lock, err)) {
+    if (!isDlinkModules(lock, err)) {
       throw new Error(
         "lock file may be saved as invalid format: " + err.join(","),
       );
@@ -230,7 +230,7 @@ async function readLockFile(): Promise<Modules | undefined> {
   }
 }
 
-type DinkOptions = {
+type DlinkOptions = {
   file: string;
   reload: boolean;
 };
@@ -253,7 +253,7 @@ async function main() {
       String(`
     USAGE
 
-      dink (just type ${green("dink")})
+      Dlink (just type ${green("Dlink")})
 
     ARGUMENTS
 
@@ -271,7 +271,7 @@ async function main() {
     Deno.exit(0);
   }
   let reload = !!(args["R"] || args["reload"]);
-  const opts: DinkOptions = {
+  const opts: DlinkOptions = {
     file: "./modules.json",
     reload,
   };
@@ -286,7 +286,7 @@ async function main() {
   const decoder = new TextDecoder();
   const json = JSON.parse(decoder.decode(file)) as Modules;
   const errors = Array<string>();
-  if (!isDinkModules(json, errors)) {
+  if (!isDlinkModules(json, errors)) {
     console.error(`${opts.file} has syntax error: ${errors.join(",")}`);
     Deno.exit(1);
   }
