@@ -18,7 +18,7 @@ const fixturesDir = await beforeEach();
 const dirname = new URL(".", import.meta.url).pathname;
 async function runDlink(dir: string) {
   const p = await Deno.run({
-    cmd: [Deno.execPath(), "run", "-A", dirname + "/Dlink.ts"],
+    cmd: [Deno.execPath(), "run", "-A", dirname + "/dlink.ts"],
     cwd: dir,
   });
   const resp = await p.status();
