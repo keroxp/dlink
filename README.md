@@ -15,13 +15,13 @@ Managing URL module specifier in Deno is qutie hard. dlink is designed to resolv
 # Install
 
 ```bash
-$ deno install --allow-write --allow-read --allow-net https://denopkg.com/keroxp/dlink/dlink.ts
+$ deno install --allow-write --allow-read --allow-net https://deno.land/x/dlink/dlink.ts
 ```
 
 with install directory:
 
 ```bash
-$ deno install --allow-write --allow-read --allow-net -d /usr/local/bin dlink https://denopkg.com/keroxp/dlink/dlink.ts
+$ deno install --allow-write --allow-read --allow-net -d /usr/local/bin dlink https://deno.land/x/dlink/dlink.ts
 ```
 
 # Usage
