@@ -8,9 +8,11 @@ Deno module linker
 
 # Concept
 
-`dlink` is designed to manage URL module specifiers for [Deno](https://deno.land).
+`dlink` is designed to manage URL module specifiers for
+[Deno](https://deno.land).
 
-Managing URL module specifier in Deno is qutie hard. dlink is designed to resolve these problems by familiar way for developers.
+Managing URL module specifier in Deno is qutie hard. dlink is designed to
+resolve these problems by familiar way for developers.
 
 # Install
 
@@ -53,7 +55,8 @@ Linked: https://deno.land/std@v0.32.0/fs/path.ts -> ./vendor/https/deno.land/std
 Linked: https://deno.land/std@v0.32.0/flags/mod.ts -> ./vendor/https/deno.land/std/flags/mod.ts
 ```
 
-dlink will automatically create module asias files that are described in `modules.json`. If there are `modules.json` like below:
+dlink will automatically create module asias files that are described in
+`modules.json`. If there are `modules.json` like below:
 
 ```json
 {
@@ -64,7 +67,8 @@ dlink will automatically create module asias files that are described in `module
 }
 ```
 
-- Alias for `":modileFile"` will be created at: `./vendor/{:moduleId}/{:moduleFile}`
+- Alias for `":modileFile"` will be created at:
+  `./vendor/{:moduleId}/{:moduleFile}`
 - Aalis is contains: `export * from "{:moduleId}{:version}{:moduleFile}"`
 
 ### 3. Import module aliases
