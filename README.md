@@ -23,7 +23,7 @@ $ deno install --allow-write --allow-read --allow-net https://deno.land/x/dlink/
 with install directory:
 
 ```bash
-$ deno install --allow-write --allow-read --allow-net -d /usr/local/bin dlink https://deno.land/x/dlink/dlink.ts
+$ deno install --allow-write --allow-read --allow-net --root /usr/local https://deno.land/x/dlink/dlink.ts
 ```
 
 # Usage
