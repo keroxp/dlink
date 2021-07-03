@@ -201,7 +201,7 @@ async function generateSkeletonFile() {
     JSON.stringify(
       {
         "https://deno.land/std": {
-          version: `@v0.50.0`,
+          version: `@0.50.0`,
           modules: ["/testing/asserts.ts"],
         },
       },
@@ -258,14 +258,14 @@ async function main() {
     ARGUMENTS
 
     OPTIONS
-   
-      -f, --file         Custom path for module.json  (Optional)         
-       
+
+      -f, --file         Custom path for module.json  (Optional)
+
     GLOBAL OPTIONS
-    
+
       -h, --help         Display help
       -V, --ver          Display version
-         
+
     `),
     );
     Deno.exit(0);
