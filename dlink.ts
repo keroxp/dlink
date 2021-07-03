@@ -201,7 +201,7 @@ async function generateSkeletonFile() {
     JSON.stringify(
       {
         "https://deno.land/std": {
-          version: `@0.50.0`,
+          version: `@0.100.0`,
           modules: ["/testing/asserts.ts"],
         },
       },
