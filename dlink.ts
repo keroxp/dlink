@@ -4,6 +4,7 @@ import { exists } from "./vendor/https/deno.land/std/fs/exists.ts";
 import * as flags from "./vendor/https/deno.land/std/flags/mod.ts";
 import { sprintf } from "./vendor/https/deno.land/std/fmt/printf.ts";
 import { gray, green, red } from "./vendor/https/deno.land/std/fmt/colors.ts";
+import * as util from "./_util.ts";
 const VERSION = "0.8.7";
 
 export type Module = {
@@ -151,8 +152,7 @@ async function writeLinkFiles({
       throw new Error(`too big source file: ${contentLength}bytes`);
     }
     const code = await resp.text();
-    // Roughly search for export default declaration
-    const hasDefaultExport = !!code.match(/export[\s\t]*default[\s\t]/);
+    const hasDefaultExport = util.hasDefaultExport(code);
     let typeDefinition: string | undefined;
     if (typeFile) {
       if (typeFile.match(/^(file|https?):\/\//) || typeFile.startsWith("/")) {
