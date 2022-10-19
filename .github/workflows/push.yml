@@ -9,12 +9,11 @@ on:
 jobs:
   build:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.label.name == 'CI start')
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Deno
-      run: |
-        echo "DENO_VERSION=$(cat .denov)" >> $GITHUB_ENV
+    - uses: denoland/setup-deno@v1
+      with:
+        deno-version: v1.x
     - uses: denolib/setup-deno@master
       with:
         deno-version: ${{ env.DENO_VERSION }}
